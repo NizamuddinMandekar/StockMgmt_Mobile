@@ -66,18 +66,17 @@ export default function LoginScreen() {
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
       >
-      <Animated.View entering={FadeInDown.duration(400)}>
       <Animated.View style={[styles.card, shakeStyle]}>
-        <Animated.View entering={FadeInDown.delay(80).duration(350)} style={styles.headerRow}>
+        <View style={styles.headerRow}>
           <LogoMark size={60} imageSize={44} radius={14} />
           <View style={styles.headerText}>
             <Text style={styles.title}>Sign in to your workspace</Text>
             <Text style={styles.subtitle}>Stock Management dashboard</Text>
           </View>
-        </Animated.View>
+        </View>
 
         <View style={styles.form}>
-          <Animated.View entering={FadeInDown.delay(150).duration(350)} style={styles.field}>
+          <View style={styles.field}>
             <Text style={styles.label}>Username</Text>
             <Input
               autoCapitalize="none"
@@ -87,13 +86,9 @@ export default function LoginScreen() {
               onChangeText={setUsername}
               editable={!loading}
             />
-          </Animated.View>
+          </View>
 
-          <Animated.View
-            entering={FadeInDown.delay(210).duration(350)}
-            style={styles.field}
-            onLayout={(e) => setPasswordFieldY(e.nativeEvent.layout.y)}
-          >
+          <View style={styles.field} onLayout={(e) => setPasswordFieldY(e.nativeEvent.layout.y)}>
             <Text style={styles.label}>Password</Text>
             <Input
               placeholder="Enter your password"
@@ -102,7 +97,7 @@ export default function LoginScreen() {
               onChangeText={setPassword}
               editable={!loading}
             />
-          </Animated.View>
+          </View>
 
           {/* This button intentionally lives outside the password field's own
               Animated.View (as a sibling at the `form` level, positioned via
@@ -128,15 +123,10 @@ export default function LoginScreen() {
             </Animated.Text>
           )}
 
-          <Animated.View entering={FadeInDown.delay(270).duration(350)}>
-            <Button title="Sign In" onPress={handleSubmit} loading={loading} style={styles.submit} />
-          </Animated.View>
+          <Button title="Sign In" onPress={handleSubmit} loading={loading} style={styles.submit} />
         </View>
 
-        <Animated.Text entering={FadeInDown.delay(330).duration(350)} style={styles.footer}>
-          Stock Management © {new Date().getFullYear()}
-        </Animated.Text>
-      </Animated.View>
+        <Text style={styles.footer}>Stock Management © {new Date().getFullYear()}</Text>
       </Animated.View>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -207,7 +197,7 @@ const styles = StyleSheet.create({
   eyeButton: {
     position: 'absolute',
     right: 14,
-    height: 46,
+    height: 48,
     width: 32,
     alignItems: 'center',
     justifyContent: 'center',

@@ -9,6 +9,7 @@ import ScreenHeader from '../components/ScreenHeader';
 import SearchBar from '../components/SearchBar';
 import SelectPicker from '../components/SelectPicker';
 import { Button, Card, EmptyState, Input, Pill } from '../components/ui';
+import { useAuth } from '../context/AuthContext';
 import { attendanceApi, authApi, employeesApi, payrollApi, salaryAdvancesApi } from '../services/api';
 import { colors, radius } from '../theme';
 import { exportCsv, exportPdf, rowsToCsv } from '../utils/exportFile';
@@ -54,6 +55,7 @@ const todayStr = () => new Date().toISOString().slice(0, 10);
 const monthStr = () => new Date().toISOString().slice(0, 7);
 
 export default function WorkforceScreen() {
+  const { user, logout } = useAuth();
   const [tab, setTab] = useState('Employees');
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -70,12 +72,33 @@ export default function WorkforceScreen() {
     load();
   }, [load]);
 
+  // HR lands directly on this screen with no tab bar/More screen around it
+  // (see MainNavigator) - it's their only destination, so unlike every other
+  // role (who can log out from the More screen) they need a way to log out
+  // right here. Every other role reaches Workforce via a stack push from
+  // More, which already has its own logout entry, so this stays hidden then.
+  const confirmLogout = () => {
+    Alert.alert('Log Out', 'Are you sure you want to log out?', [
+      { text: 'Cancel', style: 'cancel' },
+      { text: 'Log Out', style: 'destructive', onPress: logout },
+    ]);
+  };
+
   return (
     <View style={styles.container}>
-      <ScreenHeader title="Workforce" />
+      <ScreenHeader
+        title="Workforce"
+        rightIcon={user?.role === 'hr' ? 'log-out-outline' : undefined}
+        onRightPress={confirmLogout}
+      />
       <View style={styles.tabs}>
         {TABS.map((t) => (
-          <Pressable key={t} onPress={() => setTab(t)} style={[styles.tab, tab === t && styles.tabActive]}>
+          <Pressable
+            key={t}
+            onPress={() => setTab(t)}
+            android_ripple={{ color: 'transparent' }}
+            style={[styles.tab, tab === t && styles.tabActive]}
+          >
             <Text style={[styles.tabText, tab === t && styles.tabTextActive]}>{t}</Text>
           </Pressable>
         ))}
@@ -1258,7 +1281,7 @@ function AdvancesTab({ employees }) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.bg },
-  tabs: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, paddingHorizontal: 16, marginBottom: 12 },
+  tabs: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, paddingHorizontal: 16, marginTop: 12, marginBottom: 12 },
   tab: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 999, backgroundColor: colors.pill },
   tabActive: { backgroundColor: colors.ink },
   tabText: { fontSize: 13, fontWeight: '600', color: colors.pillText },
@@ -1267,7 +1290,7 @@ const styles = StyleSheet.create({
   form: { gap: 10, marginBottom: 12 },
   formTitle: { fontSize: 15, fontWeight: '700', color: colors.text },
   modal: { flex: 1, backgroundColor: colors.bg },
-  modalContent: { padding: 16, paddingTop: 4, gap: 10, paddingBottom: 40 },
+  modalContent: { padding: 16, paddingTop: 12, gap: 10, paddingBottom: 40 },
   modalActions: { flexDirection: 'row', gap: 10, marginTop: 8 },
   sectionDivider: { marginTop: 6, marginBottom: 2 },
   sectionDividerText: {

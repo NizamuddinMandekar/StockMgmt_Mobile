@@ -1,14 +1,58 @@
 import { API_BASE_URL, getAuthToken, clearSession } from './apiConfig';
 
-// Requests get 15s to complete before we give up - without this, a hung
+// Requests get 30s to complete before we give up - without this, a hung
 // network or unresponsive server left the app looking frozen forever with
-// no error surfaced to the user.
-const REQUEST_TIMEOUT_MS = 15000;
+// no error surfaced to the user. Login specifically needs real headroom
+// here: it's the very first request the app makes, so there's no warm
+// connection yet - a cold DNS lookup + TLS handshake right after a fresh
+// install can genuinely take longer than a shorter timeout would allow,
+// which was showing as a false "network error" even with a good connection.
+const REQUEST_TIMEOUT_MS = 30000;
 
 function timeoutSignal(ms) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), ms);
   return { signal: controller.signal, clear: () => clearTimeout(timer) };
+}
+
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+// A single fetch() attempt. Throws a clean, user-facing Error - never the
+// raw fetch error (which can leak the API hostname) - on timeout or a real
+// connectivity failure.
+async function attemptFetch(url, options) {
+  const { signal, clear } = timeoutSignal(REQUEST_TIMEOUT_MS);
+  try {
+    return await fetch(url, { ...options, signal });
+  } catch (err) {
+    if (err.name === 'AbortError') {
+      throw new Error('Request timed out. Please check your connection and try again.');
+    }
+    throw new Error('No internet connection. Please check your Wi-Fi or mobile data and try again.');
+  } finally {
+    clear();
+  }
+}
+
+// Retries a couple of times on a genuine connectivity failure only (never on
+// a timeout, and never on a normal HTTP error response, both of which
+// resolve/throw differently). This exists because login() chains three
+// requests back to back right after a fresh connection is established
+// (POST /login, then GET /me, then GET /warehouses) - a single transient
+// blip on any one of those was enough to fail the whole login even though
+// the token from the first request had already been saved, leaving the
+// user stuck on an error while a background retry (or just reopening the
+// app, which re-reads that saved token) would have worked fine.
+async function fetchWithRetry(url, options, retries = 2) {
+  for (let attempt = 0; ; attempt++) {
+    try {
+      return await attemptFetch(url, options);
+    } catch (err) {
+      const isConnectivityFailure = err.message.startsWith('No internet connection');
+      if (!isConnectivityFailure || attempt >= retries) throw err;
+      await sleep(500 * (attempt + 1));
+    }
+  }
 }
 
 async function request(path, options = {}) {
@@ -22,23 +66,7 @@ async function request(path, options = {}) {
     headers.Authorization = `Bearer ${token}`;
   }
 
-  const { signal, clear } = timeoutSignal(REQUEST_TIMEOUT_MS);
-  let res;
-  try {
-    res = await fetch(`${API_BASE_URL}${path}`, { ...options, headers, signal });
-  } catch (err) {
-    if (err.name === 'AbortError') {
-      throw new Error('Request timed out. Please check your connection and try again.');
-    }
-    // fetch only throws for a real connectivity failure (no network, DNS
-    // lookup failed, etc.) - never for an HTTP error status, which resolves
-    // normally with res.ok = false. The raw error (e.g. "Network request
-    // failed" or "Unable to resolve host <api url>") is not something a
-    // user should ever see, so it's always replaced here.
-    throw new Error('No internet connection. Please check your Wi-Fi or mobile data and try again.');
-  } finally {
-    clear();
-  }
+  const res = await fetchWithRetry(`${API_BASE_URL}${path}`, { ...options, headers });
 
   if (res.status === 204) return null;
 
@@ -69,23 +97,11 @@ export async function login(username, password) {
   body.set('username', username);
   body.set('password', password);
 
-  const { signal, clear } = timeoutSignal(REQUEST_TIMEOUT_MS);
-  let res;
-  try {
-    res = await fetch(`${API_BASE_URL}/api/auth/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: body.toString(),
-      signal,
-    });
-  } catch (err) {
-    if (err.name === 'AbortError') {
-      throw new Error('Request timed out. Please check your connection and try again.');
-    }
-    throw new Error('No internet connection. Please check your Wi-Fi or mobile data and try again.');
-  } finally {
-    clear();
-  }
+  const res = await fetchWithRetry(`${API_BASE_URL}/api/auth/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: body.toString(),
+  });
 
   const data = await res.json().catch(() => ({}));
 

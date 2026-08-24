@@ -52,7 +52,7 @@ export default function ProductPicker({ products, value, onChange, placeholder =
 
 const styles = StyleSheet.create({
   trigger: {
-    height: 46,
+    height: 48,
     borderWidth: 1,
     borderColor: colors.border,
     borderRadius: radius.md,

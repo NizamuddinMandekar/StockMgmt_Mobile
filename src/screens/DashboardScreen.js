@@ -489,9 +489,9 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: 16,
-    paddingTop: 4,
+    paddingTop: 12,
     paddingBottom: 40,
-    gap: 14,
+    gap: 10,
   },
   grid: {
     flexDirection: 'row',
@@ -513,7 +513,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '700',
     color: colors.text,
-    marginTop: 4,
+    marginTop: 2,
   },
   statSubtitle: {
     fontSize: 11,

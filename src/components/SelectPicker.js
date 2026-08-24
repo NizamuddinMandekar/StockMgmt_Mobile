@@ -55,7 +55,7 @@ export default function SelectPicker({ items, value, onChange, placeholder = 'Se
 
 const styles = StyleSheet.create({
   trigger: {
-    height: 46,
+    height: 48,
     borderWidth: 1,
     borderColor: colors.border,
     borderRadius: radius.md,

@@ -28,7 +28,7 @@ const emptyPaymentDetails = () => ({
   transactionId: '',
 });
 
-export default function StockInScreen() {
+export default function StockInScreen({ embedded = false } = {}) {
   const { activeBranchId } = useAuth();
   const [products, setProducts] = useState([]);
   const [vendors, setVendors] = useState([]);
@@ -338,7 +338,7 @@ export default function StockInScreen() {
 
   return (
     <View style={styles.container}>
-      <ScreenHeader title="Stock In" />
+      {!embedded && <ScreenHeader title="Stock In" />}
       <FlatList
         data={recentMovements}
         keyExtractor={(item) => String(item.id)}
@@ -600,7 +600,7 @@ export default function StockInScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.bg },
-  content: { padding: 16, paddingTop: 4, paddingBottom: 40, gap: 10 },
+  content: { padding: 16, paddingTop: 12, paddingBottom: 40, gap: 10 },
   summaryRow: { flexDirection: 'row', gap: 10, marginBottom: 12 },
   summaryCard: { flex: 1, gap: 2 },
   summaryLabel: { fontSize: 12, color: colors.textMuted },

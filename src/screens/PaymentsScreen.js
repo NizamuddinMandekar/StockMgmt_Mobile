@@ -417,7 +417,7 @@ export default function PaymentsScreen() {
               </Card>
             </View>
 
-            <SearchBar placeholder="Search vendor..." value={search} onChangeText={setSearch} style={{ marginBottom: 4 }} />
+            <SearchBar placeholder="Search vendor..." value={search} onChangeText={setSearch} style={{ marginBottom: 10 }} />
             <SectionTitle>List of Vendors</SectionTitle>
           </>
         }
@@ -775,18 +775,18 @@ export default function PaymentsScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.bg },
-  content: { padding: 16, paddingTop: 4, paddingBottom: 40, gap: 10 },
+  content: { padding: 16, paddingTop: 12, paddingBottom: 40, gap: 10 },
   summaryRow: { flexDirection: 'row', gap: 10, marginBottom: 12 },
   totalCard: { gap: 2 },
   totalLabel: { fontSize: 12, color: colors.textMuted },
-  totalValue: { fontSize: 22, fontWeight: '700', color: colors.success, marginTop: 4 },
+  totalValue: { fontSize: 22, fontWeight: '700', color: colors.success, marginTop: 2 },
   negativeValue: { color: colors.danger },
   helperText: { fontSize: 11, color: colors.textMuted, marginTop: 2 },
   row: { flexDirection: 'row', alignItems: 'center', gap: 10, padding: 14 },
   name: { fontSize: 14, fontWeight: '600', color: colors.text },
   meta: { fontSize: 12, color: colors.textMuted, marginTop: 2 },
   modal: { flex: 1, backgroundColor: colors.bg },
-  modalContent: { padding: 16, paddingTop: 4, paddingBottom: 40, gap: 10 },
+  modalContent: { padding: 16, paddingTop: 12, paddingBottom: 40, gap: 10 },
   balanceCard: { gap: 10 },
   actionsRow: { flexDirection: 'row', gap: 10, marginTop: 4 },
   detailRow: { flexDirection: 'row', alignItems: 'center', gap: 10, padding: 14 },

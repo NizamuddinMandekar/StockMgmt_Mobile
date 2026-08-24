@@ -12,7 +12,7 @@ import { colors, radius } from '../theme';
 
 const emptyFilters = { fromDate: '', toDate: '', productId: null, warehouseId: null, vendorId: null };
 
-export default function StockHistoryScreen() {
+export default function StockHistoryScreen({ embedded = false } = {}) {
   const { activeBranchId } = useAuth();
   const [movements, setMovements] = useState([]);
   const [products, setProducts] = useState([]);
@@ -78,7 +78,7 @@ export default function StockHistoryScreen() {
 
   return (
     <View style={styles.container}>
-      <ScreenHeader title="Stock In History" />
+      {!embedded && <ScreenHeader title="Stock In History" />}
       <FlatList
         data={filtered}
         keyExtractor={(item) => String(item.id)}
@@ -199,7 +199,7 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: 16,
-    paddingTop: 4,
+    paddingTop: 12,
     paddingBottom: 40,
     gap: 10,
   },
@@ -222,7 +222,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '700',
     color: colors.text,
-    marginTop: 4,
+    marginTop: 2,
   },
   statSubtitle: {
     fontSize: 11,

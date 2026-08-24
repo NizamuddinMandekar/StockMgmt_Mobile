@@ -155,10 +155,10 @@ function FieldLabel({ children }) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.bg },
-  content: { padding: 16, paddingTop: 4, paddingBottom: 40, gap: 10 },
+  content: { padding: 16, paddingTop: 12, paddingBottom: 40, gap: 10 },
   grid: { flexDirection: 'row', gap: 12, marginBottom: 12 },
   statCard: { flex: 1 },
-  statValue: { fontSize: 20, fontWeight: '700', color: colors.text, marginTop: 4 },
+  statValue: { fontSize: 20, fontWeight: '700', color: colors.text, marginTop: 2 },
   statLabel: { fontSize: 12, color: colors.textMuted },
   filterCard: { gap: 6 },
   rowInputs: { flexDirection: 'row', gap: 10 },

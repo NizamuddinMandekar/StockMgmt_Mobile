@@ -524,7 +524,7 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: 16,
-    paddingTop: 4,
+    paddingTop: 12,
     paddingBottom: 40,
     gap: 10,
   },
@@ -552,7 +552,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   modal: { flex: 1, backgroundColor: colors.bg },
-  modalContent: { padding: 16, paddingTop: 4, gap: 10, paddingBottom: 40 },
+  modalContent: { padding: 16, paddingTop: 12, gap: 10, paddingBottom: 40 },
   modalActions: { flexDirection: 'row', gap: 10, marginTop: 8 },
   formActions: { flexDirection: 'row', gap: 10 },
   fieldLabel: { fontSize: 13, fontWeight: '600', color: colors.pillText, marginTop: 6 },

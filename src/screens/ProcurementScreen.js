@@ -509,7 +509,7 @@ export default function ProcurementScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.bg },
-  content: { padding: 16, paddingTop: 4, paddingBottom: 40, gap: 10 },
+  content: { padding: 16, paddingTop: 12, paddingBottom: 40, gap: 10 },
   form: { gap: 10, marginBottom: 12 },
   formTitle: { fontSize: 15, fontWeight: '700', color: colors.text, marginTop: 4 },
   label: { fontSize: 13, fontWeight: '600', color: colors.pillText },
@@ -545,6 +545,6 @@ const styles = StyleSheet.create({
   itemActions: { flexDirection: 'row', gap: 10 },
   itemLine: { fontSize: 13, color: colors.text, flex: 1 },
   modal: { flex: 1, backgroundColor: colors.bg },
-  modalContent: { padding: 16, paddingTop: 4, gap: 10, paddingBottom: 40 },
+  modalContent: { padding: 16, paddingTop: 12, gap: 10, paddingBottom: 40 },
   modalActions: { flexDirection: 'row', gap: 10, marginTop: 8 },
 });

@@ -15,7 +15,7 @@ const REASONS = ['Used in Kitchen', 'Wastage - Expired', 'Wastage - Damaged', 'W
 
 const emptyDraft = { productId: null, entryUnit: '', quantity: '', reason: REASONS[0], departmentId: null };
 
-export default function StockOutScreen() {
+export default function StockOutScreen({ embedded = false } = {}) {
   const { activeBranchId } = useAuth();
   const [products, setProducts] = useState([]);
   const [departments, setDepartments] = useState([]);
@@ -136,7 +136,7 @@ export default function StockOutScreen() {
 
   return (
     <View style={styles.container}>
-      <ScreenHeader title="Stock Out" />
+      {!embedded && <ScreenHeader title="Stock Out" />}
       <FlatList
         data={movements}
         keyExtractor={(item) => String(item.id)}
@@ -244,7 +244,7 @@ export default function StockOutScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.bg },
-  content: { padding: 16, paddingTop: 4, paddingBottom: 40, gap: 10 },
+  content: { padding: 16, paddingTop: 12, paddingBottom: 40, gap: 10 },
   form: { gap: 10, marginBottom: 12 },
   formTitle: { fontSize: 15, fontWeight: '700', color: colors.text, marginBottom: 2 },
   availableText: { fontSize: 12, color: colors.textMuted },

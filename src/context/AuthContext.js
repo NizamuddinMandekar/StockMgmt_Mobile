@@ -24,11 +24,13 @@ export function AuthProvider({ children }) {
       return;
     }
     try {
-      const me = await authApi.me();
+      // me/warehouses/saved-branch-id are all independent of each other -
+      // fetching them one at a time in sequence was adding their latencies
+      // together for no reason, making every app open (and login below)
+      // noticeably slower than it needed to be.
+      const [me, list, savedBranch] = await Promise.all([authApi.me(), warehousesApi.list(), getActiveBranchId()]);
       setUser(me);
-      const list = await warehousesApi.list();
       setBranches(list);
-      const savedBranch = await getActiveBranchId();
       setActiveBranchIdState(savedBranch);
       setStatus('signedIn');
     } catch {
@@ -44,9 +46,8 @@ export function AuthProvider({ children }) {
   const login = useCallback(async (username, password) => {
     const data = await loginRequest(username, password);
     await setAuthToken(data.access_token);
-    const me = await authApi.me();
+    const [me, list] = await Promise.all([authApi.me(), warehousesApi.list()]);
     setUser(me);
-    const list = await warehousesApi.list();
     setBranches(list);
     if (list.length === 1) {
       await setActiveBranchId(list[0].id);

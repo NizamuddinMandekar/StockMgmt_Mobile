@@ -493,7 +493,7 @@ function DetailRow({ label, value, danger }) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.bg },
-  content: { padding: 16, paddingTop: 4, paddingBottom: 40, gap: 10 },
+  content: { padding: 16, paddingTop: 12, paddingBottom: 40, gap: 10 },
   form: { gap: 6, marginBottom: 12 },
   fieldLabel: { fontSize: 13, fontWeight: '600', color: colors.pillText, marginTop: 6 },
   requiredMark: { color: colors.danger },

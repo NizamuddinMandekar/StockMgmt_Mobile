@@ -140,7 +140,8 @@ export default function StockOutScreen({ embedded = false } = {}) {
       <FlatList
         data={movements}
         keyExtractor={(item) => String(item.id)}
-        contentContainerStyle={styles.content}
+        contentContainerStyle={styles.flatContent}
+        ItemSeparatorComponent={() => <View style={styles.separator} />}
         ListHeaderComponent={
           <>
             <Card style={styles.form}>
@@ -222,17 +223,15 @@ export default function StockOutScreen({ embedded = false } = {}) {
         renderItem={({ item, index }) => {
           const product = productMap[item.product_id];
           return (
-            <Animated.View entering={FadeInDown.delay(index * 30).duration(250)}>
-              <Card style={styles.movementRow}>
-                <View style={{ flex: 1 }}>
-                  <Text style={styles.movementName}>{product?.name || `Product #${item.product_id}`}</Text>
-                  <Text style={styles.movementMeta}>
-                    {new Date(item.created_at).toLocaleString()}
-                    {item.note ? ` · ${item.note}` : ''}
-                  </Text>
-                </View>
-                <Pill label={`${Math.abs(item.quantity)} ${product?.unit_of_measure || ''}`} tone={item.movement_type === 'wastage' ? 'danger' : 'warning'} />
-              </Card>
+            <Animated.View entering={FadeInDown.delay(index * 30).duration(250)} style={styles.movementRow}>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.movementName}>{product?.name || `Product #${item.product_id}`}</Text>
+                <Text style={styles.movementMeta}>
+                  {new Date(item.created_at).toLocaleString()}
+                  {item.note ? ` · ${item.note}` : ''}
+                </Text>
+              </View>
+              <Pill label={`${Math.abs(item.quantity)} ${product?.unit_of_measure || ''}`} tone={item.movement_type === 'wastage' ? 'danger' : 'warning'} />
             </Animated.View>
           );
         }}
@@ -245,6 +244,8 @@ export default function StockOutScreen({ embedded = false } = {}) {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.bg },
   content: { padding: 16, paddingTop: 12, paddingBottom: 40, gap: 10 },
+  flatContent: { padding: 16, paddingTop: 12, paddingBottom: 40 },
+  separator: { height: 1, backgroundColor: colors.border },
   form: { gap: 10, marginBottom: 12 },
   formTitle: { fontSize: 15, fontWeight: '700', color: colors.text, marginBottom: 2 },
   availableText: { fontSize: 12, color: colors.textMuted },
@@ -266,7 +267,7 @@ const styles = StyleSheet.create({
   cartName: { fontSize: 14, fontWeight: '600', color: colors.text },
   cartMeta: { fontSize: 12, color: colors.textMuted, marginTop: 2 },
   removeText: { fontSize: 13, color: colors.danger, fontWeight: '600' },
-  movementRow: { flexDirection: 'row', alignItems: 'center', gap: 10, padding: 14 },
+  movementRow: { flexDirection: 'row', alignItems: 'center', gap: 10, padding: 14, backgroundColor: colors.card },
   movementName: { fontSize: 14, fontWeight: '600', color: colors.text },
   movementMeta: { fontSize: 12, color: colors.textMuted, marginTop: 2 },
 });

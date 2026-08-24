@@ -72,7 +72,8 @@ export default function WastageScreen() {
       <FlatList
         data={filtered}
         keyExtractor={(item) => String(item.id)}
-        contentContainerStyle={styles.content}
+        contentContainerStyle={styles.flatContent}
+        ItemSeparatorComponent={() => <View style={styles.separator} />}
         ListHeaderComponent={
           <>
             <View style={styles.grid}>
@@ -126,20 +127,18 @@ export default function WastageScreen() {
         renderItem={({ item, index }) => {
           const product = productMap[item.product_id];
           return (
-            <Animated.View entering={FadeInDown.delay(Math.min(index, 12) * 25).duration(250)}>
-              <Card style={styles.row}>
-                <View style={{ flex: 1 }}>
-                  <Text style={styles.name}>{product?.name || `Product #${item.product_id}`}</Text>
-                  <Text style={styles.meta}>{new Date(item.created_at).toLocaleString()}</Text>
-                  <Text style={styles.meta}>Reason: {item.note || '-'}</Text>
-                </View>
-                <View style={{ alignItems: 'flex-end' }}>
-                  <Text style={styles.qty}>
-                    {Math.abs(item.quantity)} {product?.unit_of_measure || ''}
-                  </Text>
-                  <Text style={styles.cost}>Rs {costOf(item).toFixed(0)}</Text>
-                </View>
-              </Card>
+            <Animated.View entering={FadeInDown.delay(Math.min(index, 12) * 25).duration(250)} style={styles.row}>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.name}>{product?.name || `Product #${item.product_id}`}</Text>
+                <Text style={styles.meta}>{new Date(item.created_at).toLocaleString()}</Text>
+                <Text style={styles.meta}>Reason: {item.note || '-'}</Text>
+              </View>
+              <View style={{ alignItems: 'flex-end' }}>
+                <Text style={styles.qty}>
+                  {Math.abs(item.quantity)} {product?.unit_of_measure || ''}
+                </Text>
+                <Text style={styles.cost}>Rs {costOf(item).toFixed(0)}</Text>
+              </View>
             </Animated.View>
           );
         }}
@@ -156,6 +155,8 @@ function FieldLabel({ children }) {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.bg },
   content: { padding: 16, paddingTop: 12, paddingBottom: 40, gap: 10 },
+  flatContent: { padding: 16, paddingTop: 12, paddingBottom: 40 },
+  separator: { height: 1, backgroundColor: colors.border },
   grid: { flexDirection: 'row', gap: 12, marginBottom: 12 },
   statCard: { flex: 1 },
   statValue: { fontSize: 20, fontWeight: '700', color: colors.text, marginTop: 2 },
@@ -163,7 +164,7 @@ const styles = StyleSheet.create({
   filterCard: { gap: 6 },
   rowInputs: { flexDirection: 'row', gap: 10 },
   fieldLabel: { fontSize: 13, fontWeight: '600', color: colors.pillText, marginTop: 6 },
-  row: { flexDirection: 'row', alignItems: 'center', gap: 10, padding: 14 },
+  row: { flexDirection: 'row', alignItems: 'center', gap: 10, padding: 14, backgroundColor: colors.card },
   name: { fontSize: 14, fontWeight: '600', color: colors.text },
   meta: { fontSize: 12, color: colors.textMuted, marginTop: 2 },
   qty: { fontSize: 13, fontWeight: '600', color: colors.text },

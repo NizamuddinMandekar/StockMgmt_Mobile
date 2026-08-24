@@ -397,7 +397,8 @@ export default function PaymentsScreen() {
       <FlatList
         data={filteredSummary}
         keyExtractor={(item) => String(item.vendor_id)}
-        contentContainerStyle={styles.content}
+        contentContainerStyle={styles.flatContent}
+        ItemSeparatorComponent={() => <View style={styles.separator} />}
         ListHeaderComponent={
           <>
             <View style={styles.summaryRow}>
@@ -423,46 +424,51 @@ export default function PaymentsScreen() {
         }
         renderItem={({ item, index }) => (
           <Animated.View entering={FadeInDown.delay(Math.min(index, 12) * 30).duration(250)}>
-            <Pressable onPress={() => openVendor(item.vendor_id)}>
-              <Card style={styles.row}>
-                <View style={{ flex: 1 }}>
-                  <Text style={styles.name}>{item.vendor_name}</Text>
-                  <Text style={styles.meta}>
-                    {item.total_bills} bill{item.total_bills === 1 ? '' : 's'} · Billed Rs {Number(item.total_bill_amount || 0).toFixed(0)}{' '}
-                    · Paid Rs {Number(item.total_amount_paid || 0).toFixed(0)}
-                    {Number(item.amount_adjusted || 0) > 0 ? ` · Adjusted Rs ${Number(item.amount_adjusted || 0).toFixed(0)}` : ''}
-                  </Text>
-                </View>
-                <Pill
-                  label={`Rs ${Number(item.balance_amount || 0).toFixed(0)}`}
-                  tone={Number(item.balance_amount || 0) > 0 ? 'danger' : 'success'}
-                />
-              </Card>
+            <Pressable onPress={() => openVendor(item.vendor_id)} style={styles.row}>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.name}>{item.vendor_name}</Text>
+                <Text style={styles.meta}>
+                  {item.total_bills} bill{item.total_bills === 1 ? '' : 's'} · Billed Rs {Number(item.total_bill_amount || 0).toFixed(0)}{' '}
+                  · Paid Rs {Number(item.total_amount_paid || 0).toFixed(0)}
+                  {Number(item.amount_adjusted || 0) > 0 ? ` · Adjusted Rs ${Number(item.amount_adjusted || 0).toFixed(0)}` : ''}
+                </Text>
+              </View>
+              <Pill
+                label={`Rs ${Number(item.balance_amount || 0).toFixed(0)}`}
+                tone={Number(item.balance_amount || 0) > 0 ? 'danger' : 'success'}
+              />
             </Pressable>
           </Animated.View>
         )}
         ListEmptyComponent={!loading && <EmptyState text="No vendor bills recorded yet" />}
         ListFooterComponent={
           <>
-            <SectionTitle>Local Purchases</SectionTitle>
+            <View style={{ marginTop: 16 }}>
+              <SectionTitle>Local Purchases</SectionTitle>
+            </View>
             {loading ? (
               <EmptyState text="Loading..." />
             ) : localPurchases.length === 0 ? (
               <EmptyState text="No local purchases recorded" />
             ) : (
-              localPurchases.map((m) => (
-                <Card key={m.id} style={styles.detailRow}>
-                  <View style={{ flex: 1 }}>
-                    <Text style={styles.name}>{productsById[m.product_id]?.name || '-'}</Text>
-                    <Text style={styles.meta}>
-                      {m.reference || 'No reference'} · Qty {m.quantity} · {new Date(m.created_at).toLocaleDateString()}
+              <View style={styles.listGroup}>
+                {localPurchases.map((m, index) => (
+                  <View
+                    key={m.id}
+                    style={[styles.detailRow, index !== localPurchases.length - 1 && styles.rowBorder]}
+                  >
+                    <View style={{ flex: 1 }}>
+                      <Text style={styles.name}>{productsById[m.product_id]?.name || '-'}</Text>
+                      <Text style={styles.meta}>
+                        {m.reference || 'No reference'} · Qty {m.quantity} · {new Date(m.created_at).toLocaleDateString()}
+                      </Text>
+                    </View>
+                    <Text style={styles.paymentAmount}>
+                      Rs {(m.quantity * Number(productsById[m.product_id]?.purchase_price || 0)).toFixed(0)}
                     </Text>
                   </View>
-                  <Text style={styles.paymentAmount}>
-                    Rs {(m.quantity * Number(productsById[m.product_id]?.purchase_price || 0)).toFixed(0)}
-                  </Text>
-                </Card>
-              ))
+                ))}
+              </View>
             )}
           </>
         }
@@ -495,27 +501,35 @@ export default function PaymentsScreen() {
             ) : bills.length === 0 ? (
               <EmptyState text="No bills yet" />
             ) : (
-              bills.map((bill) => (
-                <Pressable key={bill.id} onPress={() => setViewingBill(bill)}>
-                  <Card style={styles.detailRow}>
+              <View style={styles.listGroup}>
+                {bills.map((bill, index) => (
+                  <Pressable
+                    key={bill.id}
+                    onPress={() => setViewingBill(bill)}
+                    style={[styles.detailRow, index !== bills.length - 1 && styles.rowBorder]}
+                  >
                     <View style={{ flex: 1 }}>
                       <Text style={styles.name}>{bill.bill_number || `Bill #${bill.id}`}</Text>
                       <Text style={styles.meta}>{bill.bill_date}</Text>
                     </View>
                     <Pill label={isBillPaid(bill) ? 'Paid' : 'Unpaid'} tone={isBillPaid(bill) ? 'success' : 'danger'} />
                     <Text style={[styles.paymentAmount, { marginLeft: 8 }]}>Rs {Number(bill.bill_amount || 0).toFixed(0)}</Text>
-                  </Card>
-                </Pressable>
-              ))
+                  </Pressable>
+                ))}
+              </View>
             )}
 
             <SectionTitle>Payment History</SectionTitle>
             {payments.length === 0 ? (
               <EmptyState text="No payments yet" />
             ) : (
-              paymentLedger.map((p) => (
-                <Pressable key={p.id} onPress={() => openEditPayment(p)}>
-                  <Card style={styles.detailRow}>
+              <View style={styles.listGroup}>
+                {paymentLedger.map((p, index) => (
+                  <Pressable
+                    key={p.id}
+                    onPress={() => openEditPayment(p)}
+                    style={[styles.detailRow, index !== paymentLedger.length - 1 && styles.rowBorder]}
+                  >
                     <View style={{ flex: 1 }}>
                       <Text style={styles.name}>{p.payment_mode || 'Adjustment'}</Text>
                       <Text style={styles.meta}>
@@ -533,9 +547,9 @@ export default function PaymentsScreen() {
                         <Text style={styles.meta}>Adj Rs {Number(p.adjustment_amount || 0).toFixed(0)}</Text>
                       )}
                     </View>
-                  </Card>
-                </Pressable>
-              ))
+                  </Pressable>
+                ))}
+              </View>
             )}
           </ScrollView>
           <Button title="Close" variant="outline" onPress={closeVendor} style={styles.closeBtn} />
@@ -776,13 +790,17 @@ export default function PaymentsScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.bg },
   content: { padding: 16, paddingTop: 12, paddingBottom: 40, gap: 10 },
+  flatContent: { padding: 16, paddingTop: 12, paddingBottom: 40 },
+  separator: { height: 1, backgroundColor: colors.border },
+  listGroup: { backgroundColor: colors.card },
+  rowBorder: { borderBottomWidth: 1, borderBottomColor: colors.border },
   summaryRow: { flexDirection: 'row', gap: 10, marginBottom: 12 },
   totalCard: { gap: 2 },
   totalLabel: { fontSize: 12, color: colors.textMuted },
   totalValue: { fontSize: 22, fontWeight: '700', color: colors.success, marginTop: 2 },
   negativeValue: { color: colors.danger },
   helperText: { fontSize: 11, color: colors.textMuted, marginTop: 2 },
-  row: { flexDirection: 'row', alignItems: 'center', gap: 10, padding: 14 },
+  row: { flexDirection: 'row', alignItems: 'center', gap: 10, padding: 14, backgroundColor: colors.card },
   name: { fontSize: 14, fontWeight: '600', color: colors.text },
   meta: { fontSize: 12, color: colors.textMuted, marginTop: 2 },
   modal: { flex: 1, backgroundColor: colors.bg },

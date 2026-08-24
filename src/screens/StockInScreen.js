@@ -342,7 +342,8 @@ export default function StockInScreen({ embedded = false } = {}) {
       <FlatList
         data={recentMovements}
         keyExtractor={(item) => String(item.id)}
-        contentContainerStyle={styles.content}
+        contentContainerStyle={styles.flatContent}
+        ItemSeparatorComponent={() => <View style={styles.separator} />}
         ListHeaderComponent={
           <>
             <View style={styles.summaryRow}>
@@ -536,13 +537,13 @@ export default function StockInScreen({ embedded = false } = {}) {
         renderItem={({ item }) => {
           const product = productMap[item.product_id];
           return (
-            <Card style={styles.movementRow}>
+            <View style={styles.movementRow}>
               <View style={{ flex: 1 }}>
                 <Text style={styles.movementName}>{product?.name || `Product #${item.product_id}`}</Text>
                 <Text style={styles.movementMeta}>{new Date(item.created_at).toLocaleString()}</Text>
               </View>
               <Pill label={`${item.quantity} ${product?.unit_of_measure || ''}`} tone="success" />
-            </Card>
+            </View>
           );
         }}
         ListEmptyComponent={!loading && <EmptyState text="No Stock In entries yet." />}
@@ -601,6 +602,8 @@ export default function StockInScreen({ embedded = false } = {}) {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.bg },
   content: { padding: 16, paddingTop: 12, paddingBottom: 40, gap: 10 },
+  flatContent: { padding: 16, paddingTop: 12, paddingBottom: 40 },
+  separator: { height: 1, backgroundColor: colors.border },
   summaryRow: { flexDirection: 'row', gap: 10, marginBottom: 12 },
   summaryCard: { flex: 1, gap: 2 },
   summaryLabel: { fontSize: 12, color: colors.textMuted },
@@ -646,7 +649,7 @@ const styles = StyleSheet.create({
   cartTotalLabel: { fontSize: 14, fontWeight: '600', color: colors.textMuted },
   cartTotalValue: { fontSize: 16, fontWeight: '700', color: colors.text },
   formActions: { flexDirection: 'row', gap: 10, marginTop: 8 },
-  movementRow: { flexDirection: 'row', alignItems: 'center', gap: 10, padding: 14 },
+  movementRow: { flexDirection: 'row', alignItems: 'center', gap: 10, padding: 14, backgroundColor: colors.card },
   movementName: { fontSize: 14, fontWeight: '600', color: colors.text },
   movementMeta: { fontSize: 12, color: colors.textMuted, marginTop: 2 },
 });

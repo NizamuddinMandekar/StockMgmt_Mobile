@@ -243,7 +243,8 @@ export default function CatalogScreen() {
       <FlatList
         data={filtered}
         keyExtractor={(item) => String(item.id)}
-        contentContainerStyle={styles.content}
+        contentContainerStyle={styles.flatContent}
+        ItemSeparatorComponent={() => <View style={styles.separator} />}
         ListHeaderComponent={
           <>
             <Button
@@ -345,30 +346,28 @@ export default function CatalogScreen() {
           </>
         }
         renderItem={({ item, index }) => (
-          <Animated.View entering={FadeInDown.delay(Math.min(index, 12) * 25).duration(250)}>
-            <Card style={styles.row}>
-              <Pressable style={{ flex: 1 }} onPress={() => handleView(item)}>
-                <Text style={styles.name}>{item.name}</Text>
-                <Text style={styles.meta}>
-                  {item.sku ? `${item.sku} · ` : ''}
-                  {categoryMap[item.category_id] || 'Uncategorized'} · {item.currentStock} {item.unit_of_measure}
-                </Text>
-              </Pressable>
-              <View style={{ alignItems: 'flex-end', gap: 6 }}>
-                <Pill label={item.status} tone={STATUS_TONE[item.status]} />
-                <View style={styles.actionRow}>
-                  <Pressable onPress={() => handleView(item)} hitSlop={6}>
-                    <Ionicons name="eye-outline" size={19} color={colors.text} />
-                  </Pressable>
-                  <Pressable onPress={() => handleOpenEdit(item)} hitSlop={6}>
-                    <Ionicons name="create-outline" size={19} color={colors.ink} />
-                  </Pressable>
-                  <Pressable onPress={() => handleDelete(item)} hitSlop={6}>
-                    <Ionicons name="trash-outline" size={19} color={colors.danger} />
-                  </Pressable>
-                </View>
+          <Animated.View entering={FadeInDown.delay(Math.min(index, 12) * 25).duration(250)} style={styles.row}>
+            <Pressable style={{ flex: 1 }} onPress={() => handleView(item)}>
+              <Text style={styles.name}>{item.name}</Text>
+              <Text style={styles.meta}>
+                {item.sku ? `${item.sku} · ` : ''}
+                {categoryMap[item.category_id] || 'Uncategorized'} · {item.currentStock} {item.unit_of_measure}
+              </Text>
+            </Pressable>
+            <View style={{ alignItems: 'flex-end', gap: 6 }}>
+              <Pill label={item.status} tone={STATUS_TONE[item.status]} />
+              <View style={styles.actionRow}>
+                <Pressable onPress={() => handleView(item)} hitSlop={6}>
+                  <Ionicons name="eye-outline" size={19} color={colors.text} />
+                </Pressable>
+                <Pressable onPress={() => handleOpenEdit(item)} hitSlop={6}>
+                  <Ionicons name="create-outline" size={19} color={colors.ink} />
+                </Pressable>
+                <Pressable onPress={() => handleDelete(item)} hitSlop={6}>
+                  <Ionicons name="trash-outline" size={19} color={colors.danger} />
+                </Pressable>
               </View>
-            </Card>
+            </View>
           </Animated.View>
         )}
         ListEmptyComponent={!loading && <EmptyState text="No products yet." />}
@@ -438,30 +437,39 @@ export default function CatalogScreen() {
               ) : movements.length === 0 ? (
                 <EmptyState text="No transactions yet" />
               ) : (
-                movements
-                  .slice()
-                  .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
-                  .map((m) => {
-                    const isIn = m.movement_type === 'in' || (m.movement_type === 'adjustment' && m.quantity > 0);
-                    const isWastage = m.movement_type === 'wastage';
-                    const typeLabel = isWastage ? 'Wastage' : isIn ? 'Stock In' : 'Stock Out';
-                    const typeTone = isWastage ? 'warning' : isIn ? 'success' : 'danger';
-                    return (
-                      <Card key={m.id} style={styles.txnRow}>
-                        <View style={{ flex: 1 }}>
-                          <Text style={styles.name}>{new Date(m.created_at).toLocaleDateString()}</Text>
-                          <Text style={styles.meta}>{m.reference || m.note || '-'}</Text>
-                        </View>
-                        <View style={{ alignItems: 'flex-end', gap: 4 }}>
-                          <Pill label={typeLabel} tone={typeTone} />
-                          <Text style={styles.txnQty}>
-                            {isIn ? '+' : '-'}
-                            {Math.abs(m.quantity)}
-                          </Text>
-                        </View>
-                      </Card>
-                    );
-                  })
+                (() => {
+                  const sortedMovements = movements
+                    .slice()
+                    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+                  return (
+                    <View style={styles.listGroup}>
+                      {sortedMovements.map((m, index) => {
+                        const isIn = m.movement_type === 'in' || (m.movement_type === 'adjustment' && m.quantity > 0);
+                        const isWastage = m.movement_type === 'wastage';
+                        const typeLabel = isWastage ? 'Wastage' : isIn ? 'Stock In' : 'Stock Out';
+                        const typeTone = isWastage ? 'warning' : isIn ? 'success' : 'danger';
+                        return (
+                          <View
+                            key={m.id}
+                            style={[styles.txnRow, index !== sortedMovements.length - 1 && styles.rowBorder]}
+                          >
+                            <View style={{ flex: 1 }}>
+                              <Text style={styles.name}>{new Date(m.created_at).toLocaleDateString()}</Text>
+                              <Text style={styles.meta}>{m.reference || m.note || '-'}</Text>
+                            </View>
+                            <View style={{ alignItems: 'flex-end', gap: 4 }}>
+                              <Pill label={typeLabel} tone={typeTone} />
+                              <Text style={styles.txnQty}>
+                                {isIn ? '+' : '-'}
+                                {Math.abs(m.quantity)}
+                              </Text>
+                            </View>
+                          </View>
+                        );
+                      })}
+                    </View>
+                  );
+                })()
               )}
 
               <Button title="Close" variant="outline" onPress={handleCloseView} style={{ marginTop: 16 }} />
@@ -494,6 +502,10 @@ function DetailRow({ label, value, danger }) {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.bg },
   content: { padding: 16, paddingTop: 12, paddingBottom: 40, gap: 10 },
+  flatContent: { padding: 16, paddingTop: 12, paddingBottom: 40 },
+  separator: { height: 1, backgroundColor: colors.border },
+  listGroup: { backgroundColor: colors.card },
+  rowBorder: { borderBottomWidth: 1, borderBottomColor: colors.border },
   form: { gap: 6, marginBottom: 12 },
   fieldLabel: { fontSize: 13, fontWeight: '600', color: colors.pillText, marginTop: 6 },
   requiredMark: { color: colors.danger },
@@ -505,7 +517,7 @@ const styles = StyleSheet.create({
   chipActive: { backgroundColor: colors.ink },
   chipText: { fontSize: 12, fontWeight: '600', color: colors.pillText },
   chipTextActive: { color: '#fff' },
-  row: { flexDirection: 'row', alignItems: 'center', gap: 10, padding: 14 },
+  row: { flexDirection: 'row', alignItems: 'center', gap: 10, padding: 14, backgroundColor: colors.card },
   name: { fontSize: 14, fontWeight: '600', color: colors.text },
   meta: { fontSize: 12, color: colors.textMuted, marginTop: 2 },
   actionRow: { flexDirection: 'row', gap: 12, marginTop: 2 },
@@ -524,6 +536,6 @@ const styles = StyleSheet.create({
   },
   detailLabel: { fontSize: 13, color: colors.textMuted },
   detailValue: { fontSize: 13, fontWeight: '600', color: colors.text },
-  txnRow: { flexDirection: 'row', alignItems: 'center', padding: 12 },
+  txnRow: { flexDirection: 'row', alignItems: 'center', padding: 12, backgroundColor: colors.card },
   txnQty: { fontSize: 13, fontWeight: '700', color: colors.text },
 });

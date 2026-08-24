@@ -82,7 +82,8 @@ export default function StockHistoryScreen({ embedded = false } = {}) {
       <FlatList
         data={filtered}
         keyExtractor={(item) => String(item.id)}
-        contentContainerStyle={styles.content}
+        contentContainerStyle={styles.flatContent}
+        ItemSeparatorComponent={() => <View style={styles.separator} />}
         ListHeaderComponent={
           <>
             <View style={styles.statRow}>
@@ -146,27 +147,25 @@ export default function StockHistoryScreen({ embedded = false } = {}) {
           const product = productMap[item.product_id];
           const purchaseTotal = item.quantity * Number(product?.purchase_price || 0);
           return (
-            <Animated.View entering={FadeInDown.delay(Math.min(index, 12) * 25).duration(250)}>
-              <Card style={styles.row}>
-                <View style={{ flex: 1 }}>
-                  <Text style={styles.name}>{product?.name || `Product #${item.product_id}`}</Text>
-                  <Text style={styles.meta}>
-                    {warehouseMap[item.warehouse_id]?.name || '-'}
-                    {item.vendor_id ? ` · ${vendorMap[item.vendor_id]?.name || '-'}` : ''}
-                  </Text>
-                  <Text style={styles.meta}>
-                    {new Date(item.created_at).toLocaleString()}
-                    {item.reference ? ` · Ref: ${item.reference}` : ''}
-                    {item.note ? ` · ${item.note}` : ''}
-                  </Text>
-                </View>
-                <View style={{ alignItems: 'flex-end', gap: 4 }}>
-                  <Text style={styles.qty}>
-                    {item.quantity} {product?.unit_of_measure || ''}
-                  </Text>
-                  <Text style={styles.value}>Rs {purchaseTotal.toLocaleString()}</Text>
-                </View>
-              </Card>
+            <Animated.View entering={FadeInDown.delay(Math.min(index, 12) * 25).duration(250)} style={styles.row}>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.name}>{product?.name || `Product #${item.product_id}`}</Text>
+                <Text style={styles.meta}>
+                  {warehouseMap[item.warehouse_id]?.name || '-'}
+                  {item.vendor_id ? ` · ${vendorMap[item.vendor_id]?.name || '-'}` : ''}
+                </Text>
+                <Text style={styles.meta}>
+                  {new Date(item.created_at).toLocaleString()}
+                  {item.reference ? ` · Ref: ${item.reference}` : ''}
+                  {item.note ? ` · ${item.note}` : ''}
+                </Text>
+              </View>
+              <View style={{ alignItems: 'flex-end', gap: 4 }}>
+                <Text style={styles.qty}>
+                  {item.quantity} {product?.unit_of_measure || ''}
+                </Text>
+                <Text style={styles.value}>Rs {purchaseTotal.toLocaleString()}</Text>
+              </View>
             </Animated.View>
           );
         }}
@@ -202,6 +201,15 @@ const styles = StyleSheet.create({
     paddingTop: 12,
     paddingBottom: 40,
     gap: 10,
+  },
+  flatContent: {
+    padding: 16,
+    paddingTop: 12,
+    paddingBottom: 40,
+  },
+  separator: {
+    height: 1,
+    backgroundColor: colors.border,
   },
   statRow: {
     flexDirection: 'row',
@@ -247,6 +255,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 10,
     padding: 14,
+    backgroundColor: colors.card,
   },
   name: {
     fontSize: 14,

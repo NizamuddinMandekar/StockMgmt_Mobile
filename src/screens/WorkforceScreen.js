@@ -263,7 +263,8 @@ function EmployeesTab({ employees, loading, reload }) {
     <FlatList
       data={filtered}
       keyExtractor={(item) => String(item.id)}
-      contentContainerStyle={styles.content}
+      contentContainerStyle={styles.flatContent}
+      ItemSeparatorComponent={() => <View style={styles.separator} />}
       ListHeaderComponent={
         <>
           <Button
@@ -281,28 +282,26 @@ function EmployeesTab({ employees, loading, reload }) {
         </>
       }
       renderItem={({ item, index }) => (
-        <Animated.View entering={FadeInDown.delay(Math.min(index, 12) * 25).duration(250)}>
-          <Card style={styles.row}>
-            <View style={{ flex: 1 }}>
-              <Text style={styles.name}>{item.full_name}</Text>
-              <Text style={styles.meta}>
-                {item.designation || 'Staff'}
-                {item.phone ? ` · ${item.phone}` : ''}
-              </Text>
-              <Text style={styles.salary}>Rs {Number(item.monthly_salary || 0).toFixed(0)}/mo</Text>
+        <Animated.View entering={FadeInDown.delay(Math.min(index, 12) * 25).duration(250)} style={styles.row}>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.name}>{item.full_name}</Text>
+            <Text style={styles.meta}>
+              {item.designation || 'Staff'}
+              {item.phone ? ` · ${item.phone}` : ''}
+            </Text>
+            <Text style={styles.salary}>Rs {Number(item.monthly_salary || 0).toFixed(0)}/mo</Text>
+          </View>
+          <View style={{ alignItems: 'flex-end', gap: 6 }}>
+            {!item.is_active && <Pill label="Inactive" tone="danger" />}
+            <View style={styles.actionRow}>
+              <Pressable onPress={() => openEdit(item)}>
+                <Text style={styles.editText}>Edit</Text>
+              </Pressable>
+              <Pressable onPress={() => handleDelete(item)}>
+                <Text style={styles.removeText}>Delete</Text>
+              </Pressable>
             </View>
-            <View style={{ alignItems: 'flex-end', gap: 6 }}>
-              {!item.is_active && <Pill label="Inactive" tone="danger" />}
-              <View style={styles.actionRow}>
-                <Pressable onPress={() => openEdit(item)}>
-                  <Text style={styles.editText}>Edit</Text>
-                </Pressable>
-                <Pressable onPress={() => handleDelete(item)}>
-                  <Text style={styles.removeText}>Delete</Text>
-                </Pressable>
-              </View>
-            </View>
-          </Card>
+          </View>
         </Animated.View>
       )}
       ListEmptyComponent={!loading && <EmptyState text="No employees yet." />}
@@ -1164,7 +1163,8 @@ function AdvancesTab({ employees }) {
     <FlatList
       data={advances}
       keyExtractor={(item) => String(item.id)}
-      contentContainerStyle={styles.content}
+      contentContainerStyle={styles.flatContent}
+      ItemSeparatorComponent={() => <View style={styles.separator} />}
       ListHeaderComponent={
         <>
           <Card style={styles.form}>
@@ -1193,31 +1193,29 @@ function AdvancesTab({ employees }) {
         </>
       }
       renderItem={({ item, index }) => (
-        <Animated.View entering={FadeInDown.delay(Math.min(index, 12) * 25).duration(250)}>
-          <Card style={styles.row}>
-            <View style={{ flex: 1 }}>
-              <Text style={styles.name}>{employeeMap[item.employee_id]?.full_name || `Employee #${item.employee_id}`}</Text>
-              <Text style={styles.meta}>
-                {item.date}
-                {item.note ? ` · ${item.note}` : ''}
-              </Text>
-            </View>
-            <View style={{ alignItems: 'flex-end', gap: 6 }}>
-              <Text style={styles.salary}>Rs {Number(item.amount || 0).toFixed(0)}</Text>
-              {item.is_settled ? (
-                <Pill label="Settled" tone="default" />
-              ) : (
-                <View style={styles.actionRow}>
-                  <Pressable onPress={() => openEdit(item)}>
-                    <Text style={styles.editText}>Edit</Text>
-                  </Pressable>
-                  <Pressable onPress={() => handleDelete(item)}>
-                    <Text style={styles.removeText}>Delete</Text>
-                  </Pressable>
-                </View>
-              )}
-            </View>
-          </Card>
+        <Animated.View entering={FadeInDown.delay(Math.min(index, 12) * 25).duration(250)} style={styles.row}>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.name}>{employeeMap[item.employee_id]?.full_name || `Employee #${item.employee_id}`}</Text>
+            <Text style={styles.meta}>
+              {item.date}
+              {item.note ? ` · ${item.note}` : ''}
+            </Text>
+          </View>
+          <View style={{ alignItems: 'flex-end', gap: 6 }}>
+            <Text style={styles.salary}>Rs {Number(item.amount || 0).toFixed(0)}</Text>
+            {item.is_settled ? (
+              <Pill label="Settled" tone="default" />
+            ) : (
+              <View style={styles.actionRow}>
+                <Pressable onPress={() => openEdit(item)}>
+                  <Text style={styles.editText}>Edit</Text>
+                </Pressable>
+                <Pressable onPress={() => handleDelete(item)}>
+                  <Text style={styles.removeText}>Delete</Text>
+                </Pressable>
+              </View>
+            )}
+          </View>
         </Animated.View>
       )}
       ListEmptyComponent={!loading && <EmptyState text="No salary advances yet." />}
@@ -1287,6 +1285,8 @@ const styles = StyleSheet.create({
   tabText: { fontSize: 13, fontWeight: '600', color: colors.pillText },
   tabTextActive: { color: '#fff' },
   content: { padding: 16, paddingTop: 4, paddingBottom: 40, gap: 10 },
+  flatContent: { padding: 16, paddingTop: 4, paddingBottom: 40 },
+  separator: { height: 1, backgroundColor: colors.border },
   form: { gap: 10, marginBottom: 12 },
   formTitle: { fontSize: 15, fontWeight: '700', color: colors.text },
   modal: { flex: 1, backgroundColor: colors.bg },
@@ -1301,7 +1301,7 @@ const styles = StyleSheet.create({
     letterSpacing: 0.4,
   },
   rowInputs: { flexDirection: 'row', gap: 10 },
-  row: { flexDirection: 'row', alignItems: 'center', gap: 10, padding: 14 },
+  row: { flexDirection: 'row', alignItems: 'center', gap: 10, padding: 14, backgroundColor: colors.card },
   name: { fontSize: 14, fontWeight: '600', color: colors.text },
   meta: { fontSize: 12, color: colors.textMuted, marginTop: 2 },
   salary: { fontSize: 12, color: colors.textMuted, marginTop: 2 },

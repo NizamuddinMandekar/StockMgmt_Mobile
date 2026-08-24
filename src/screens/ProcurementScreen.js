@@ -297,7 +297,8 @@ export default function ProcurementScreen() {
       <FlatList
         data={grouped}
         keyExtractor={(item) => item.request_number}
-        contentContainerStyle={styles.content}
+        contentContainerStyle={styles.flatContent}
+        ItemSeparatorComponent={() => <View style={styles.separator} />}
         ListHeaderComponent={
           <>
             <Button
@@ -383,8 +384,7 @@ export default function ProcurementScreen() {
           </>
         }
         renderItem={({ item, index }) => (
-          <Animated.View entering={FadeInDown.delay(Math.min(index, 12) * 30).duration(250)}>
-            <Card style={styles.row}>
+          <Animated.View entering={FadeInDown.delay(Math.min(index, 12) * 30).duration(250)} style={styles.row}>
               <View style={styles.rowHeader}>
                 <Text style={styles.reqNumber}>#{item.request_number}</Text>
                 <Pill label={item.status} tone={STATUS_TONE[item.status] || 'default'} />
@@ -434,7 +434,6 @@ export default function ProcurementScreen() {
                   </View>
                 </View>
               ))}
-            </Card>
           </Animated.View>
         )}
         ListEmptyComponent={!loading && <EmptyState text="No procurement requests yet." />}
@@ -510,6 +509,8 @@ export default function ProcurementScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.bg },
   content: { padding: 16, paddingTop: 12, paddingBottom: 40, gap: 10 },
+  flatContent: { padding: 16, paddingTop: 12, paddingBottom: 40 },
+  separator: { height: 1, backgroundColor: colors.border },
   form: { gap: 10, marginBottom: 12 },
   formTitle: { fontSize: 15, fontWeight: '700', color: colors.text, marginTop: 4 },
   label: { fontSize: 13, fontWeight: '600', color: colors.pillText },
@@ -522,7 +523,7 @@ const styles = StyleSheet.create({
   cartText: { fontSize: 13, color: colors.text, fontWeight: '500' },
   cartMeta: { fontSize: 11, color: colors.textMuted, marginTop: 1 },
   removeText: { fontSize: 12, color: colors.danger, fontWeight: '600' },
-  row: { padding: 14, gap: 6 },
+  row: { padding: 14, gap: 6, backgroundColor: colors.card },
   rowHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   reqNumber: { fontSize: 14, fontWeight: '700', color: colors.text },
   vendorLine: { fontSize: 12, color: colors.textMuted },
